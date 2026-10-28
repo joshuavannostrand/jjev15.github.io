@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#17191e">
+<meta name="description" content="A live, personal student dashboard for Rochester Institute of Technology.">
+<title>TigerHub — Your RIT Day</title>
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+<link rel="stylesheet" href="/static/styles.css">
+<script src="/static/app.js" defer></script>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <a class="brand" href="#overview" aria-label="TigerHub home"><span class="brand-symbol">T<span class="brand-small">.</span></span><span><b>TigerHub</b><small>YOUR RIT COMPANION</small></span></a>
+    <div class="side-heading">WORKSPACE</div>
+    <nav class="side-nav" aria-label="Dashboard navigation">
+      <a class="nav-link active" href="#overview" data-view="overview"><span class="nav-icon" data-icon="layout"></span> Overview <span class="nav-current"></span></a>
+      <a class="nav-link" href="#schedule" data-view="schedule"><span class="nav-icon" data-icon="calendar"></span> My schedule</a>
+      <a class="nav-link" href="#deadlines" data-view="deadlines"><span class="nav-icon" data-icon="clipboard"></span> Assignments <span id="navDue" class="nav-pill">0</span></a>
+      <a class="nav-link" href="#dining" data-view="dining"><span class="nav-icon" data-icon="utensils"></span> Campus dining</a>
+      <a class="nav-link" href="#focus" data-view="focus"><span class="nav-icon" data-icon="check"></span> Focus list</a>
+    </nav>
+    <div class="side-heading resources-heading">YOUR SHORTCUTS</div>
+    <nav class="side-nav compact" aria-label="RIT links">
+      <a class="nav-link" href="https://mycourses.rit.edu/" target="_blank" rel="noopener noreferrer"><span class="nav-icon" data-icon="external"></span> myCourses <span class="external-marker">↗</span></a>
+      <a class="nav-link" href="https://tigercenter.rit.edu/" target="_blank" rel="noopener noreferrer"><span class="nav-icon" data-icon="external"></span> Tiger Center <span class="external-marker">↗</span></a>
+      <a class="nav-link" href="https://google.rit.edu/" target="_blank" rel="noopener noreferrer"><span class="nav-icon" data-icon="external"></span> RIT Mail <span class="external-marker">↗</span></a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="live-indicator"><span class="pulse-dot"></span> Auto-sync every 5 minutes</div>
+      <button class="sidebar-settings" type="button" id="sideSettings"><span data-icon="settings"></span><span>Connections & settings</span><span class="arrow">↗</span></button>
+      <div class="side-footer"><span class="tiny-orange-square"></span> Made for campus life.</div>
+    </div>
+  </aside>
+
+  <main class="main" id="overview">
+    <header class="topbar">
+      <div class="breadcrumb">MY WORKSPACE <span>/</span> <b>OVERVIEW</b></div>
+      <div class="top-actions">
+        <span id="syncState" class="sync-status"><span class="small-green-dot"></span> Connecting sources</span>
+        <button class="icon-btn" id="refreshBtn" type="button" aria-label="Refresh live information" title="Refresh all live data"><span data-icon="refresh"></span></button>
+        <button class="account-btn" id="openSettings" type="button"><span id="accountInitials" class="account-avatar">R</span> <span class="account-text"><b id="accountName">RIT student</b><small id="accountSubtitle">Manage connections</small></span><span data-icon="chevron-down"></span></button>
+      </div>
+    </header>
+    <div class="content">
+      <div class="hero-row">
+        <div>
+          <div class="eyebrow"><span class="eyebrow-bar"></span> YOUR DAILY BRIEFING <span id="todayTag" class="today-date"></span></div>
+          <h1 id="greeting">Make today count<span class="orange-dot">.</span></h1>
+          <p class="hero-subtitle" id="heroSubtitle">Everything you need for another day at RIT, all in one place.</p>
+        </div>
+        <div class="clock-tile"><span data-icon="clock"></span><div><strong id="liveClock">--:--</strong><span>ROCHESTER, NY</span></div></div>
+      </div>
+
+      <div id="demoNotice" class="notice demo-notice hidden" role="status"><span class="notice-icon" data-icon="sparkles"></span><div><strong>You're viewing sample schedule data.</strong><span>Weather and dining are live. Connect Google Calendar or myCourses for your real agenda.</span></div><button type="button" class="text-button" id="demoTurnOff">Hide sample</button></div>
+      <div id="feedErrors" class="notice error-notice hidden" role="alert"><span class="notice-icon" data-icon="alert"></span><div><strong>Some data could not be refreshed.</strong><span id="feedErrorText"></span></div><button type="button" class="text-button" id="retryFeeds">Retry</button></div>
+
+      <section class="metric-grid" aria-label="Daily overview">
+        <div class="metric-card"><div class="metric-top"><span>EVENTS TODAY</span><span class="metric-icon purple" data-icon="calendar"></span></div><div class="metric-bottom"><strong id="todayEventsCount">—</strong><span id="todayEventsDesc">On your calendar</span></div><div class="metric-bar purple-bar"></div></div>
+        <div class="metric-card"><div class="metric-top"><span>DUE THIS WEEK</span><span class="metric-icon orange" data-icon="clipboard"></span></div><div class="metric-bottom"><strong id="weekDueCount">—</strong><span id="weekDueDesc">From myCourses</span></div><div class="metric-bar orange-bar"></div></div>
+        <div class="metric-card"><div class="metric-top"><span>UP NEXT</span><span class="metric-icon cyan" data-icon="clock"></span></div><div class="metric-bottom"><strong class="metric-short" id="upNextTitle">—</strong><span id="upNextTime">No upcoming events yet</span></div><div class="metric-bar cyan-bar"></div></div>
+        <div class="metric-card"><div class="metric-top"><span>CAMPUS WEATHER</span><span class="metric-icon blue" data-icon="cloud"></span></div><div class="metric-bottom"><strong id="tempMetric">—</strong><span id="weatherMetricDesc">RIT • Henrietta, NY</span></div><div class="metric-bar blue-bar"></div></div>
+      </section>
+
+      <div class="primary-grid">
+        <section class="panel schedule-panel" id="schedule">
+          <div class="panel-header"><div><div class="section-kicker">YOUR TIME</div><h2>Daily schedule <span class="light-accent">↗</span></h2></div><div class="panel-header-actions"><span class="data-label" id="scheduleDataLabel">MY CALENDAR</span></div></div>
+          <div id="dayStrip" class="day-strip" role="group" aria-label="Choose a day"></div>
+          <div class="schedule-summary"><span id="selectedDayName">Today</span><span id="selectedDayCount">0 events</span></div>
+          <div id="agendaItems" class="agenda-items"><div class="empty-state"><span data-icon="calendar"></span><strong>Loading your schedule</strong><p>Your next events will appear here.</p></div></div>
+          <div class="panel-footer"><button class="footer-link" id="connectCalendarCta" type="button"><span data-icon="plus"></span> Connect a calendar</button><span id="agendaUpdated" class="muted-mini">—</span></div>
+        </section>
+
+        <section class="panel weather-panel" id="weather">
+          <div class="panel-header weather-head"><div><div class="section-kicker">OUTSIDE ON CAMPUS</div><h2>Rochester forecast</h2></div><span class="live-chip"><span></span> LIVE</span></div>
+          <div class="weather-main"><div class="weather-emoji" id="weatherEmoji">☁️</div><div class="weather-text"><div class="big-temp" id="weatherTemp">--<span>°</span></div><strong id="weatherCondition">Checking conditions...</strong><span id="feelsLike">RIT campus · Henrietta</span></div></div>
+          <div class="weather-high-low"><span id="weatherHighLow">High — / Low —</span><span id="weatherRain"><span data-icon="droplet"></span> Rain —</span></div>
+          <div class="weather-chart-header"><span>NEXT 12 HOURS</span><span>Temperature °F</span></div>
+          <div class="weather-chart" id="weatherChart" aria-label="Hourly temperature trend"><div class="chart-placeholder">Loading forecast…</div></div>
+          <div id="forecastDays" class="forecast-days"></div>
+          <div class="weather-source">Powered by <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a> · RIT campus coordinates</div>
+        </section>
+      </div>
+
+      <div class="secondary-grid">
+        <section class="panel deadline-panel" id="deadlines">
+          <div class="panel-header"><div><div class="section-kicker">STAY AHEAD</div><h2>Upcoming assignments</h2></div><button class="plain-icon-button" type="button" id="courseSettings" title="Connect myCourses"><span data-icon="settings"></span></button></div>
+          <div class="deadlines-toolbar"><div class="tabs" role="group" aria-label="Assignment time range"><button class="tab active" data-due-range="7" type="button">7 days</button><button class="tab" data-due-range="21" type="button">3 weeks</button></div><span id="dueSourceLabel" class="source-mark">MYCOURSES</span></div>
+          <div id="assignmentItems" class="assignment-items"></div>
+          <div class="panel-footer"><a class="footer-link" href="https://mycourses.rit.edu/" target="_blank" rel="noopener noreferrer">Open myCourses <span data-icon="arrow-right"></span></a><span class="muted-mini">Calendar-feed deadlines</span></div>
+        </section>
+
+        <section class="panel dining-panel" id="dining">
+          <div class="panel-header"><div><div class="section-kicker">FUEL YOUR DAY</div><h2>What's cooking?</h2></div><span class="live-chip"><span></span> RIT DINING</span></div>
+          <div class="dining-intro"><span class="food-glow">🍜</span><div><strong>Find your next bite.</strong><span>Live dining locations, visiting chefs and links to full menus.</span></div></div>
+          <div class="dining-subhead"><span>VISITING CHEFS TODAY</span><a href="https://www.rit.edu/dining/" target="_blank" rel="noopener noreferrer">All dining ↗</a></div>
+          <div id="chefList" class="chef-list"><div class="food-loading">Checking today's specials…</div></div>
+          <div class="dining-subhead outlets-heading"><span>CAMPUS SPOTS</span><span id="outletCount" class="tiny-gray">—</span></div>
+          <div id="diningList" class="dining-list"></div>
+          <div class="panel-footer"><button id="expandDining" class="footer-link" type="button">View all dining spots <span data-icon="arrow-down"></span></button><a class="muted-mini subtle-link" href="https://www.rit.edu/dining/menus" target="_blank" rel="noopener noreferrer">Full daily menus ↗</a></div>
+        </section>
+      </div>
+
+      <div class="bottom-grid" id="focus">
+        <section class="panel focus-panel"><div class="panel-header"><div><div class="section-kicker">JUST FOR YOU</div><h2>Today's focus</h2></div><span class="source-mark">SAVED IN THIS BROWSER</span></div><form id="focusForm" class="focus-form"><input id="focusInput" type="text" maxlength="110" placeholder="Add something you want to accomplish..." aria-label="Add a focus task" required><button type="submit" class="orange-add"><span data-icon="plus"></span> Add</button></form><div id="focusList" class="focus-list"></div></section>
+        <section class="quick-links"><div class="section-kicker">ONE CLICK AWAY</div><h2>Campus essentials.</h2><div class="quick-link-grid"><a href="https://mycourses.rit.edu/" target="_blank" rel="noopener noreferrer"><span class="quick-icon lilac" data-icon="book"></span><span><b>myCourses</b><small>Courses & grades</small></span><span class="quick-arrow">↗</span></a><a href="https://tigercenter.rit.edu/" target="_blank" rel="noopener noreferrer"><span class="quick-icon pastel-orange" data-icon="graduation"></span><span><b>Tiger Center</b><small>Student services</small></span><span class="quick-arrow">↗</span></a><a href="https://www.rit.edu/dining/menus" target="_blank" rel="noopener noreferrer"><span class="quick-icon pastel-green" data-icon="utensils"></span><span><b>RIT Dining</b><small>Full daily menus</small></span><span class="quick-arrow">↗</span></a><a href="https://events.rit.edu/" target="_blank" rel="noopener noreferrer"><span class="quick-icon pastel-blue" data-icon="sparkles"></span><span><b>RIT Events</b><small>What's happening</small></span><span class="quick-arrow">↗</span></a></div></section>
+      </div>
+      <footer class="footer"><span><strong>TigerHub</strong> · Unofficial student-built dashboard · Not affiliated with RIT</span><span id="lastRefreshed">Data refreshes every 5 minutes</span></footer>
+    </div>
+  </main>
+</div>
+
+<div id="settingsModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+  <div class="modal"><div class="modal-top"><div><div class="section-kicker">MAKE IT YOURS</div><h2 id="settingsTitle">Your connections</h2><p>Link your accounts once, then let TigerHub handle the daily updates.</p></div><button class="close-modal" type="button" id="closeSettings" aria-label="Close settings">✕</button></div>
+  <div class="modal-body">
+    <div class="connect-row"><div class="connect-icon google-icon">G</div><div class="connect-info"><strong>Google Calendar <span id="googlePill" class="connect-pill">Not connected</span></strong><p>Recommended for RIT student accounts. Read-only access to your selected calendars.</p><small id="googleEmail"></small></div><button type="button" id="googleAction" class="connect-button">Connect</button></div>
+    <div class="connect-row"><div class="connect-icon d2l-icon">m<span>c</span></div><div class="connect-info"><strong>myCourses <span id="mycoursesPill" class="connect-pill">Not connected</span></strong><p>Paste your Brightspace calendar subscription link to track course dates and deadlines.</p><button id="toggleMycoursesForm" type="button" class="inline-help">How to find the link <span>⌄</span></button><div id="mycoursesHelp" class="help-copy hidden">In <a href="https://mycourses.rit.edu/" target="_blank" rel="noopener noreferrer">myCourses</a>, open <b>Calendar</b> → <b>Settings</b> → enable calendar feeds → <b>Subscribe</b> → choose <b>All Calendars and Tasks</b> → copy the subscription URL. Do not copy a one-time .ics download.</div></div><button type="button" id="mycoursesDisconnect" class="disconnect-button hidden">Remove</button></div>
+    <form id="mycoursesForm" class="feed-form"><label for="mycoursesUrl">MYCOURSES SUBSCRIPTION URL</label><div class="feed-input-line"><input type="url" id="mycoursesUrl" placeholder="https://mycourses.rit.edu/d2l/..." autocomplete="off" spellcheck="false"><button type="submit">Save feed</button></div><small>The URL is encrypted in a private browser cookie and fetched by your server.</small></form>
+    <div class="connect-row"><div class="connect-icon other-icon">i</div><div class="connect-info"><strong>Other calendar feed <span id="personalPill" class="connect-pill">Optional</span></strong><p>For a separate Outlook, Apple/iCloud or other supported calendar subscription.</p></div><button type="button" id="personalDisconnect" class="disconnect-button hidden">Remove</button></div>
+    <form id="personalForm" class="feed-form"><label for="personalUrl">OTHER CALENDAR ICS URL</label><div class="feed-input-line"><input type="url" id="personalUrl" placeholder="https://.../calendar.ics" autocomplete="off" spellcheck="false"><button type="submit">Save feed</button></div></form>
+    <div class="modal-tip"><span data-icon="shield"></span><div><strong>Privacy first.</strong> Read-only Google Calendar permission. No passwords are requested. Feed URLs are private bearer links; do not share them publicly. Your Google and feed credentials stay in encrypted HTTP-only cookies, not your page code.</div></div>
+    <div class="settings-options"><label><input type="checkbox" id="previewCheckbox"> Show example schedule and deadlines (preview)</label><p id="settingsMessage" aria-live="polite"></p></div>
+  </div><div class="modal-bottom"><a href="https://mycourses.rit.edu/" target="_blank" rel="noopener noreferrer">Open RIT myCourses ↗</a><button class="save-close" id="doneSettings" type="button">Done</button></div></div>
+</div>
+<div id="toast" class="toast hidden" role="status"></div>
+</body>
+</html>
